@@ -229,7 +229,8 @@ def heights(rows):
 
 def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, height_min, height_max, width_min, width_max, rel_height, prominence_min, prominence_max, wlen, threshold_min, threshold_max, plateau_min, plateau_max, compute_dips, event, select_all_peaks, clear_selection, fill_selection_value, fill_selection_button, remove_prominence, upload_data_contents, upload_data_filename, null_selection_button, delete_selection_button, interpolation_direction, run_interpolation, offset_value_a, offset_value_b, run_offset_button):
     triggered_id = ctx.triggered_id
-    print("buttion", find_peaks_btn)
+    print("find peaksbuttion", find_peaks_btn)
+    
     if not rows or triggered_id == 'upload-data':
         if upload_data_contents or triggered_id == 'upload-data': # if there is data to upload
             content_type, content_string = upload_data_contents.split(',')
@@ -269,8 +270,9 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
     #        #df["selection"] = False
     #       df.loc[~df["peaks"].isna(), "selection"] = True
         
-    if triggered_id == 'clear_selection' and clear_selection > 0:
-            df["selection"] = False
+    if triggered_id == 'clear_selection':# and clear_selection > 0:
+        print("clear selection button")
+        df["selection"] = False
 
     if triggered_id == 'fill_selection_button' and fill_selection_value is not None:
             df.loc[df["selection"] == True, "data"] = fill_selection_value
@@ -382,13 +384,14 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
                 df.loc[df["selection"] == True, "data"] += df['prominences']
             df["selection"] = False
     
-    if find_peaks_btn is False: # button turns blue when false so lets go with this though it doesnt make any sense
+    if find_peaks_btn is True: # button turns blue when false so lets go with this though it doesnt make any sense
+        print("run find peaks")
         #df["selection"] = False # cleaR SELECTION
             # Extract data
         x = df.iloc[:, 0]  # Datetime column
         x = df["datetime"]
         y = df.iloc[:, 1]  # Measurement column
-        print("compute dipps",compute_dips)
+        
         if compute_dips is False:
                 y = df["data"]
         if compute_dips is True:
@@ -442,7 +445,7 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
             'plateau_size': (plateau_min, plateau_min)
        
             }
-        print(params)
+        
         # Filter out None values or completely unused ones
         filtered_params = {k: v for k, v in params.items() if v is not None}
 
@@ -452,7 +455,7 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
         #peaks, peak_properties = find_peaks(y, distance=peak_distance, height = (height_min, height_max), width = (width_min, width_max), rel_height = rel_height, prominence = (prominence_min, prominence_max), wlen = wlen, threshold = (threshold_min, threshold_max), plateau_size = (plateau_min, plateau_max))
         #peaks, peak_properties = find_peaks(y, distance=None, height = (None, None), width = (None, None), rel_height = None, prominence = (None, None), wlen = None, threshold = (None, None), plateau_size = (None, None))
         #peaks, peak_properties = find_peaks(y)
-        print("peaks", peaks)
+       
         #print("peak properties", peak_properties)  
         #right_bases = peak_properties['right_bases'] # index value of right base
         height = peak_properties['peak_heights'] # index value of right base
@@ -484,11 +487,8 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
             
         df["selection"] = False
         df.loc[peaks, "selection"] = True
-        
-        print("df")
-        print(df.loc[df["peaks"] == 1])    
-
-        #if select_all_peaks is True:
+       
+        #if select_all_peaks is False:
         #    #    df["selection"] = False
         #        df.loc[~df["peaks"].isna(), "selection"] = True
     
