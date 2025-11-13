@@ -229,6 +229,7 @@ def heights(rows):
 
 def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, height_min, height_max, width_min, width_max, rel_height, prominence_min, prominence_max, wlen, threshold_min, threshold_max, plateau_min, plateau_max, compute_dips, event, select_all_peaks, clear_selection, fill_selection_value, fill_selection_button, remove_prominence, upload_data_contents, upload_data_filename, null_selection_button, delete_selection_button, interpolation_direction, run_interpolation, offset_value_a, offset_value_b, run_offset_button):
     triggered_id = ctx.triggered_id
+    print("buttion", find_peaks_btn)
     if not rows or triggered_id == 'upload-data':
         if upload_data_contents or triggered_id == 'upload-data': # if there is data to upload
             content_type, content_string = upload_data_contents.split(',')
@@ -381,12 +382,13 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
                 df.loc[df["selection"] == True, "data"] += df['prominences']
             df["selection"] = False
     
-    if find_peaks_btn is True:
+    if find_peaks_btn is False: # button turns blue when false so lets go with this though it doesnt make any sense
+        #df["selection"] = False # cleaR SELECTION
             # Extract data
         x = df.iloc[:, 0]  # Datetime column
         x = df["datetime"]
         y = df.iloc[:, 1]  # Measurement column
-
+        print("compute dipps",compute_dips)
         if compute_dips is False:
                 y = df["data"]
         if compute_dips is True:
@@ -417,8 +419,9 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
         #prominence_max = None if prominence_max < .01 else prominence_max
         prominence_min = None if (prominence_min is not None and prominence_min < 0.01) else prominence_min
         prominence_max = None if (prominence_max is not None and prominence_max < 0.01) else prominence_max
-        if wlen <= .01:
-                wlen = None
+        # wlen is the prominence window size so it has to be none if there is no prominace window
+        if (prominence_min is None or prominence_max is None) and wlen < 0.01:
+            wlen = None
     
         #ddd 
         threshold_min = None if threshold_min < .01 else threshold_min
@@ -479,14 +482,15 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
 
         df.loc[peaks, 'prominences'] = np.round(prominences, 2) # store peak prominence on peak row
             
-        
+        df["selection"] = False
+        df.loc[peaks, "selection"] = True
         
         print("df")
-        print(df.head(4))    
+        print(df.loc[df["peaks"] == 1])    
 
-        if select_all_peaks is True:
-            #    df["selection"] = False
-                df.loc[~df["peaks"].isna(), "selection"] = True
+        #if select_all_peaks is True:
+        #    #    df["selection"] = False
+        #        df.loc[~df["peaks"].isna(), "selection"] = True
     
     desired_order = ["datetime", "data", "initial_data", "selection"]
     df = df[[col for col in desired_order if col in df.columns]].copy()
