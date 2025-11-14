@@ -41,53 +41,96 @@ app.layout = html.Div([
         dcc.Markdown( "data download"),
         html.Button("Download CSV", id="csv-button", n_clicks=0),
             ], style={'display': 'flex', 'gap': '10px', 'border': '2px solid black', 'padding': '10px', 'border-radius': '5px', 'align-items': 'center', 'backgroundColor': 'lightblue' }),
-    html.Div([
-        html.Label("find_peakss"),
-        daq.BooleanSwitch(id='find_peaks_btn', on=False),
+        # find peaks selector within find peaks
+        html.Div([
+            html.Div(style={'border-left': '2px solid #ccc', 'height': '100%', 'margin': '0 15px'}),  # Vertical divider
+            html.Label("find_peaks"),
+            daq.BooleanSwitch(id='find_peaks_btn', on=True),
+            html.Div([
+            html.Label("peaks vs dips"),
+            daq.BooleanSwitch(id='compute_dips', on=False),
+            html.Label("Select Area Under Peaks"),
+            daq.BooleanSwitch(id='select_area_under_peaks', on=True),
+            html.Button('Select/Re-Select Peaks', id='re_select_peaks_btn', n_clicks=0),
+    ], id='peak-controls-div', style={'display': 'none'}),  # Initially hidden
         #html.Div(id='boolean-switch-result')
             ], style={'display': 'flex', 'gap': '10px', 'border': '2px solid black', 'padding': '10px', 'border-radius': '5px', 'align-items': 'center'}),
+    ### tabs
+    
+    
+    
+   
+    # variables in columns
     html.Div([
-        html.Label("peak distance:"),
-        dcc.Input(id='peak_distance', type='number', min=0, max=100, step=0.01, value = 0),
-            ], style={'display': 'flex', 'gap': '10px', 'border': '2px solid black', 'padding': '10px', 'border-radius': '5px', 'align-items': 'center'}),
-    html.Div([
-        html.Label("height (min/max):"),
-        dcc.Input(id='height_min', type='number', min=0, max=100, step=0.01, value = 0),
-        dcc.Input(id='height_max', type='number', min=0, max=100, step=0.01, value = 0),
-            ], style={'display': 'flex', 'gap': '10px', 'border': '2px solid black', 'padding': '10px', 'border-radius': '5px', 'align-items': 'center'}),
-     html.Div([
-        html.Label("width (min/max):"),
-        dcc.Input(id='width_min', type='number', min=0, max=100, step=0.01, value = 0),
-        dcc.Input(id='width_max', type='number', min=0, max=100, step=0.01, value = 0),
-        html.Label(" relative height: "),
-        dcc.Input(id='rel_height', type='number', min=0, max=100, step=0.01, value = 0),
-            ], style={'display': 'flex', 'gap': '10px', 'border': '2px solid black', 'padding': '10px', 'border-radius': '5px', 'align-items': 'center'}),
-    html.Div([
-        html.Label("prominence (min/max):"),
-        dcc.Input(id='prominence_min', type='number', min=0, max=100, step=0.01, value = 0),
-        dcc.Input(id='prominence_max', type='number', min=0, max=100, step=0.01, value = 0),
-        html.Label(" wlen: "),
-        dcc.Input(id='wlen', type='number', min=0, max=100, step=0.01, value = 0),
-            ], style={'display': 'flex', 'gap': '10px', 'border': '2px solid black', 'padding': '10px', 'border-radius': '5px', 'align-items': 'center'}),
-    html.Div([
-        html.Label("threshold (min/max):"),
-        dcc.Input(id='threshold_min', type='number', min=0, max=100, step=0.01, value = 0),
-        dcc.Input(id='threshold_max', type='number', min=0, max=100, step=0.01, value = 0),
-            ], style={'display': 'flex', 'gap': '10px', 'border': '2px solid black', 'padding': '10px', 'border-radius': '5px', 'align-items': 'center'}),
-    html.Div([
-        html.Label("plateau (min/max):"),
-        dcc.Input(id='plateau_min', type='number', min=0, max=100, step=0.01, value = 0),
-        dcc.Input(id='plateau_max', type='number', min=0, max=100, step=0.01, value = 0),
-            ], style={'display': 'flex', 'gap': '10px', 'border': '2px solid black', 'padding': '10px', 'border-radius': '5px', 'align-items': 'center'}),
-     html.Div([
-        html.Label("peaks vs dips"),
-        daq.BooleanSwitch(id='compute_dips', on=False),
-        #html.Div(id='boolean-switch-result')
-            ], style={'display': 'flex', 'gap': '10px', 'border': '2px solid black', 'padding': '10px', 'border-radius': '5px', 'align-items': 'center'}),
+        # peak distance column
+        html.Div([
+            html.Label("peak distance:"),
+            dcc.Input(id='peak_distance', type='number', min=0, max=100, step=0.01, value = 0),
+            html.Label("distance between peaks"),
+        ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '5px'}),
+
+        html.Div(style={'border-left': '2px solid #ccc', 'align-self': 'stretch', 'margin': '0 15px'}),  # Vertical divider
+        # peak height column
+        html.Div([
+            html.Label("peak height (min/max):"),
+            dcc.Input(id='height_min', type='number', min=0, max=100, step=0.01, value = 0),
+            dcc.Input(id='height_max', type='number', min=0, max=100, step=0.01, value = 0),
+        ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '5px'}),
+
+        html.Div(style={'border-left': '2px solid #ccc', 'align-self': 'stretch', 'margin': '0 15px'}),  # Vertical divider
+        # width column
+        html.Div([
+            html.Label("width (min/max):"),
+            dcc.Input(id='width_min', type='number', min=0, max=100, step=0.01, value = 0),
+            dcc.Input(id='width_max', type='number', min=0, max=100, step=0.01, value = 0),
+        ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '5px'}),
+
+        html.Div(style={'border-left': '2px solid #ccc', 'align-self': 'stretch', 'margin': '0 15px'}),  # Vertical divider
+        # relative height column
+        html.Div([
+            html.Label("relative height (Precent as 0-1):"),
+            dcc.Input(id='rel_height', type='number', min=0, max=1, step=0.01, value = 1),
+            html.Label("% height used to find peak base"),
+        ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '5px'}),
+
+        html.Div(style={'border-left': '2px solid #ccc', 'align-self': 'stretch', 'margin': '0 15px'}),  # Vertical divider
+        # prominence column
+        html.Div([
+            html.Label("prominence (min/max):"),
+            dcc.Input(id='prominence_min', type='number', min=0, max=100, step=0.01, value = 0),
+            dcc.Input(id='prominence_max', type='number', min=0, max=100, step=0.01, value = 0),
+        ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '5px'}),
+
+        html.Div(style={'border-left': '2px solid #ccc', 'align-self': 'stretch', 'margin': '0 15px'}),  # Vertical divider
+        # wlen column
+        html.Div([
+            html.Label(" wlen: "),
+            dcc.Input(id='wlen', type='number', min=0, max=100, step=0.01, value = 0),
+            html.Label("window size"),
+        ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '5px'}),
+
+        html.Div(style={'border-left': '2px solid #ccc', 'align-self': 'stretch', 'margin': '0 15px'}),  # Vertical divider
+        # threshold column
+        html.Div([
+            html.Label("threshold (min/max):"),
+            dcc.Input(id='threshold_min', type='number', min=0, max=100, step=0.01, value=0, placeholder='min'),
+            dcc.Input(id='threshold_max', type='number', min=0, max=100, step=0.01, value=0, placeholder='max'),
+        ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '5px'}),
+        
+        html.Div(style={'border-left': '2px solid #ccc', 'align-self': 'stretch', 'margin': '0 15px'}),  # Vertical divider
+        # plateau column
+        html.Div([
+            html.Label("plateau (min/max):"),
+            dcc.Input(id='plateau_min', type='number', min=0, max=100, step=0.01, value=0, placeholder='min'),
+            dcc.Input(id='plateau_max', type='number', min=0, max=100, step=0.01, value=0, placeholder='max'),
+            ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '5px'}),
+    ], id='peak-parameters-div', style={'display': 'none'}),
+        
      html.Div([
         html.Label("selection"),
-        html.Label("select all peaks"),
-        daq.BooleanSwitch(id='select_all_peaks', on=False),
+    
+        #html.Button('Select Area Under Peaks', id='select_area_under_peaks_btn', n_clicks=0),  # Clear button
+        #daq.BooleanSwitch(id='select_all_peaks', on=False),
         html.Button('clear selection', id='clear_selection', n_clicks=0),  # Clear button
         html.Button('remove prominence', id='remove_prominence', n_clicks=0),  # Clear button
         html.Label("Fill Selection with Value:"),
@@ -136,7 +179,27 @@ app.layout = html.Div([
     ),
     
 ])
+# control visability of peak controsl
+@app.callback(
+    Output('peak-controls-div', 'style'),  # controls "select area under peaks" etc
+    Output('peak-parameters-div', 'style'), # controls peak height etc
+    Input('find_peaks_btn', 'on')
+)
+def toggle_peak_controls(find_peaks_btn):
+    if find_peaks_btn is True:
+        controls_style = {'display': 'flex', 'gap': '10px', 'border': '2px solid black', 
+                'padding': '10px', 'border-radius': '5px', 'align-items': 'center'}
 
+        parameters_style =  {'display': 'flex', 'gap': '10px', 'border': '2px solid black', 
+                'padding': '10px', 'border-radius': '5px', 'align-items': 'center',
+                'justify-content': 'center', 'margin': '0 auto'}, 
+        return {'display': 'flex', 'gap': '10px', 'border': '2px solid black', 
+                'padding': '10px', 'border-radius': '5px', 'align-items': 'center'}, {'display': 'flex', 'gap': '10px', 'border': '2px solid black', 
+                'padding': '10px', 'border-radius': '5px', 'align-items': 'center',
+                'justify-content': 'center', 'margin': '0 auto'}
+    else:
+        # Hide the div
+        return {'display': 'none'}, {'display': 'none'}
 
 @app.callback(
     Output("peak_distance", "max"),
@@ -151,7 +214,13 @@ def distance(rows):
     Input("data-grid", "rowData"), 
 )
 def heights(rows):
-    return len(rows), len(rows)
+    # returns the maximimum allowed value based on data max
+    if rows:
+        df = pd.DataFrame(rows)
+        min_value = df.iloc[:, 1].min()  # Assuming column 1 is your signal
+        max_value = df.iloc[:, 1].max()  # Assuming column 1 is your signal
+        return max_value, max_value
+    return 0, 100  # Default fallback
 
 @app.callback(
     Output("width_min", "max"),
@@ -211,7 +280,8 @@ def heights(rows):
     Input("plateau_max", "value"),
     Input('compute_dips', 'on'),
     Input("data-grid", "cellValueChanged"),  
-    Input('select_all_peaks', 'on'),
+    Input('re_select_peaks_btn', 'n_clicks'),
+    Input('select_area_under_peaks', 'on'),
     Input('clear_selection', 'n_clicks'),  # Trigger when the button is clicked
     Input('fill_selection_value', 'value'),  # Clear button
     Input('fill_selection_button', 'n_clicks'),  # Clear button
@@ -227,7 +297,7 @@ def heights(rows):
     Input('run_offset_button', "n_clicks"),
 )
 
-def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, height_min, height_max, width_min, width_max, rel_height, prominence_min, prominence_max, wlen, threshold_min, threshold_max, plateau_min, plateau_max, compute_dips, event, select_all_peaks, clear_selection, fill_selection_value, fill_selection_button, remove_prominence, upload_data_contents, upload_data_filename, null_selection_button, delete_selection_button, interpolation_direction, run_interpolation, offset_value_a, offset_value_b, run_offset_button):
+def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, height_min, height_max, width_min, width_max, rel_height, prominence_min, prominence_max, wlen, threshold_min, threshold_max, plateau_min, plateau_max, compute_dips, event, re_select_peaks_btn, select_area_under_peaks, clear_selection, fill_selection_value, fill_selection_button, remove_prominence, upload_data_contents, upload_data_filename, null_selection_button, delete_selection_button, interpolation_direction, run_interpolation, offset_value_a, offset_value_b, run_offset_button):
     triggered_id = ctx.triggered_id
     print("find peaksbuttion", find_peaks_btn)
     
@@ -384,7 +454,7 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
                 df.loc[df["selection"] == True, "data"] += df['prominences']
             df["selection"] = False
     
-    if find_peaks_btn is True: # button turns blue when false so lets go with this though it doesnt make any sense
+    if find_peaks_btn is True or triggered_id == 're_select_peaks_btn':  # button turns blue when false so lets go with this though it doesnt make any sense
         print("run find peaks")
         #df["selection"] = False # cleaR SELECTION
             # Extract data
@@ -451,13 +521,12 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
 
             # Call find_peaks with only the active parameters
         peaks, peak_properties = find_peaks(y, **filtered_params)
-        #peaks, peak_properties = find_peaks(y, distance=peak_distance, height = (height_min, height_max), width = (width_min, width_max), rel_height = rel_height, prominence = (prominence_min, prominence_max), wlen = wlen, threshold = (threshold_min, threshold_max), plateau_size = (plateau_min, plateau_max))
-        #peaks, peak_properties = find_peaks(y, distance=peak_distance, height = (height_min, height_max), width = (width_min, width_max), rel_height = rel_height, prominence = (prominence_min, prominence_max), wlen = wlen, threshold = (threshold_min, threshold_max), plateau_size = (plateau_min, plateau_max))
-        #peaks, peak_properties = find_peaks(y, distance=None, height = (None, None), width = (None, None), rel_height = None, prominence = (None, None), wlen = None, threshold = (None, None), plateau_size = (None, None))
-        #peaks, peak_properties = find_peaks(y)
+
+
+        # peak widths
        
-        #print("peak properties", peak_properties)  
-        #right_bases = peak_properties['right_bases'] # index value of right base
+        #peak_widths(x, peaks, rel_height=0.5, prominence_data=None, wlen=None)
+        
         height = peak_properties['peak_heights'] # index value of right base
         right_thresholds = peak_properties['right_thresholds'] # round this at the end
         left_thresholds = peak_properties['left_thresholds'] # round this at the end
@@ -465,32 +534,40 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
         #prominence = np.round(peak_properties['prominences'], 5) # height: I think its peak-right base
         prominences = peak_properties['prominences'] # round this at the end
             
-        #threshold = peak_properties['leftthreshold']
-        #height = peak_properties['peak_heights']
-        # reset to nan or drp
-        df["peaks"] = np.nan
-        df["height"] = np.nan
-        df["left_thresholds"] = np.nan
-        df["right_thresholds"] = np.nan
-        df["widths"] = np.nan
-        df["prominences"] = np.nan
+        left_ips = peak_properties["left_ips"]
+        left_ips = left_ips.round(0).astype(int)
         
+        right_ips = peak_properties["right_ips"]
+        right_ips = right_ips.round(0).astype(int)
+       
+        df["peaks"] = np.nan
+        #df["height"] = np.nan
+        #df["left_thresholds"] = np.nan
+        #df["right_thresholds"] = np.nan
+        #df["widths"] = np.nan
+        #df["prominences"] = np.nan
+        #df["left_ips"] = np.nan
+        #df["right_ips"] = np.nan
             
             
         df.loc[peaks, "peaks"] = df.iloc[peaks, 1]  # Store peak values
-        df.loc[peaks, 'height'] = np.round(height, 2) # store peak prominence on peak row
-        df.loc[peaks, 'widths'] = np.round(widths, 2) # store peak prominence on peak row
-        df.loc[peaks, 'left_thresholds'] = np.round(left_thresholds, 2) # store peak prominence on peak row
-        df.loc[peaks, 'right_thresholds'] = np.round(right_thresholds, 2) # store peak prominence on peak row
+        #df.loc[peaks, 'height'] = np.round(height, 2) # store peak prominence on peak row
+        #df.loc[peaks, 'widths'] = np.round(widths, 2) 
+        # store peak prominence on peak row
+        #df.loc[peaks, 'left_thresholds'] = np.round(left_thresholds, 2) # store peak prominence on peak row
+        #df.loc[peaks, 'right_thresholds'] = np.round(right_thresholds, 2) # store peak prominence on peak row
 
-        df.loc[peaks, 'prominences'] = np.round(prominences, 2) # store peak prominence on peak row
-            
+        #df.loc[peaks, 'prominences'] = np.round(prominences, 2) # store peak prominence on peak row
+        
+
         df["selection"] = False
         df.loc[peaks, "selection"] = True
-       
-        #if select_all_peaks is False:
-        #    #    df["selection"] = False
-        #        df.loc[~df["peaks"].isna(), "selection"] = True
+        if select_area_under_peaks is True: 
+            for left_ip, right_ip in zip(left_ips, right_ips):
+                start = max(0, left_ip)
+                end = min(len(df), right_ip + 1)
+                df.iloc[start:end, df.columns.get_loc("selection")] = True
+        
     
     desired_order = ["datetime", "data", "initial_data", "selection"]
     df = df[[col for col in desired_order if col in df.columns]].copy()
