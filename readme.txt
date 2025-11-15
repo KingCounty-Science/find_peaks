@@ -1,3 +1,6 @@
+### this app is live ###
+https://peaks-and-offset-editor.onrender.com/
+
 ## to create requirements.txt
 pip list --format=freeze | findstr -v "pkg1 pkg2 ..." > requirements.txt
 
