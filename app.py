@@ -16,7 +16,7 @@ from dash import Dash, dcc, html, dash_table, Input, Output, State, callback
 import base64
 import datetime
 import io
-
+import gunicorn
 import pandas as pd
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -30,11 +30,11 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # Initialize the Dash app
 
-app = dash.Dash(__name__)
+#app = dash.Dash(__name__)
 server = app.server  # This is important for Render
 
 app.layout = html.Div([
-    html.H1("Editable AG Grid and Line Graph"),
+    html.H1("Find Peaks, Dips and Offsets Editor"),
     
   
     html.Div([
