@@ -29,7 +29,9 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 #df['initial'] = 
 
 # Initialize the Dash app
+
 app = dash.Dash(__name__)
+server = app.server  # This is important for Render
 
 app.layout = html.Div([
     html.H1("Editable AG Grid and Line Graph"),
@@ -299,7 +301,6 @@ def heights(rows):
 
 def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, height_min, height_max, width_min, width_max, rel_height, prominence_min, prominence_max, wlen, threshold_min, threshold_max, plateau_min, plateau_max, compute_dips, event, re_select_peaks_btn, select_area_under_peaks, clear_selection, fill_selection_value, fill_selection_button, remove_prominence, upload_data_contents, upload_data_filename, null_selection_button, delete_selection_button, interpolation_direction, run_interpolation, offset_value_a, offset_value_b, run_offset_button):
     triggered_id = ctx.triggered_id
-    print("find peaksbuttion", find_peaks_btn)
     
     if not rows or triggered_id == 'upload-data':
         if upload_data_contents or triggered_id == 'upload-data': # if there is data to upload
@@ -341,7 +342,6 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
     #       df.loc[~df["peaks"].isna(), "selection"] = True
         
     if triggered_id == 'clear_selection':# and clear_selection > 0:
-        print("clear selection button")
         df["selection"] = False
 
     if triggered_id == 'fill_selection_button' and fill_selection_value is not None:
@@ -363,14 +363,11 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
 
     if triggered_id == 'run_offset_button':
         
-        print("run offset")
         # Boolean mask
         mask = df["selection"] == True  
 
         # Filter DataFrame based on the mask
         filtered_df = df[mask].copy()
-        print("filtered df")
-        print(filtered_df.head(4))
         if not filtered_df.empty:
             # Initialize 'offset' with NaNs
             filtered_df["offset"] = np.nan
@@ -651,5 +648,5 @@ def export_data_as_csv(n_clicks, filename, rows):
 # Run the app
 if __name__ == "__main__":
     #app.run_server(debug=True)
-    app.run(debug=True)
+    app.run(debug=False)
     #app.run_server(debug=True, host="0.0.0.0", port=8051)
