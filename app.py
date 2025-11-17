@@ -91,7 +91,7 @@ app.layout = html.Div([
         # relative height column
         html.Div([
             html.Label("relative height (Precent as 0-1):"),
-            dcc.Input(id='rel_height', type='number', min=0, max=1, step=0.01, value = 1),
+            dcc.Input(id='rel_height', type='number', min=0, max=1, step=0.01, value = .8),
             html.Label("% height used to find peak base"),
         ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '5px'}),
 
