@@ -164,7 +164,6 @@ app.layout = html.Div([
 
             ], style={'display': 'flex', 'gap': '10px', 'border': '2px solid black', 'padding': '10px', 'border-radius': '5px', 'align-items': 'center'}),
     html.Div([dcc.Graph(id="line-graph")]),
-    html.Div(id="text-output", children="SQL Connection Test Not Run"),
     dag.AgGrid(
         id="data-grid",
         #rowData=df.to_dict("records"),
@@ -265,7 +264,6 @@ def heights(rows):
 @app.callback(
     [Output("data-grid", "rowData"), 
     Output("data-grid", "columnDefs")],
-    Output("text-output", "children"),
     Input("data-grid", "rowData"),
     Input("line-graph", "selectedData"),# Capture lasso selection
     Input('find_peaks_btn', 'on'),
@@ -568,32 +566,9 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
     desired_order = ["datetime", "data", "initial_data", "selection"]
     df = df[[col for col in desired_order if col in df.columns]].copy()
     
-    try:
-        from sqlalchemy import text, create_engine
-        import urllib
-        host_name = "KCITSQLPRNRPX01"
-        db_name = "gData"
-        server = "KCITSQLPRNRPX01"
-        server = "10.82.12.39"
-        driver = "SQL Server"
-        
-        sql_alchemy_connection = urllib.parse.quote_plus('DRIVER={'+driver+'}; SERVER='+server+'; DATABASE='+db_name+'; Trusted_Connection=yes;')
-        sql_engine = create_engine("mssql+pyodbc:///?odbc_connect=%s" % sql_alchemy_connection)
-        conn = sql_engine.raw_connection()
+   
 
-        sql = f"""
-        SELECT TOP 4 SITE_CODE as site
-        from tblGaugeLLID 
-        WHERE STATUS = 'Active'
-        """
-
-        site_list = pd.read_sql_query(sql, conn)
-        conn.close()
-        sql_output = site_list['site'].tolist()
-    except Exception as e:
-        sql_output = str(e)
-
-    return df.to_dict("records"), [{"field": col, "editable": True} for col in df.columns], sql_output
+    return df.to_dict("records"), [{"field": col, "editable": True} for col in df.columns]
 
 
 @app.callback(
