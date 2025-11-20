@@ -164,6 +164,7 @@ app.layout = html.Div([
 
             ], style={'display': 'flex', 'gap': '10px', 'border': '2px solid black', 'padding': '10px', 'border-radius': '5px', 'align-items': 'center'}),
     html.Div([dcc.Graph(id="line-graph")]),
+    html.Div(id="text-output", children="SQL Connection Test Not Run"),
     dag.AgGrid(
         id="data-grid",
         #rowData=df.to_dict("records"),
@@ -264,6 +265,7 @@ def heights(rows):
 @app.callback(
     [Output("data-grid", "rowData"), 
     Output("data-grid", "columnDefs")],
+    Output("text-output", "children"),
     Input("data-grid", "rowData"),
     Input("line-graph", "selectedData"),# Capture lasso selection
     Input('find_peaks_btn', 'on'),
@@ -317,7 +319,7 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
                     df['selection'] = False
                     df['initial_data'] = df['data']
             except Exception as e:
-                print(e)
+                #print(e)
                 return dash.no_update
         else:
             df = pd.read_csv(r"data/test_data/waterlevel_test.csv", names=["datetime", "data"], parse_dates=["datetime"], header=0)
@@ -402,14 +404,11 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
                 print("offset b value", offset_value_b)
             filtered_df.loc[~filtered_df["offset"].isna(), "offset"] = filtered_df.loc[~filtered_df["offset"].isna(), "data"] - filtered_df.loc[~filtered_df["offset"].isna(), "offset"]
             print("offset calc")
-            print(filtered_df)
             print("offset pre fill")
-            print(filtered_df)
             filtered_df["offset"] = filtered_df["offset"].interpolate(method='linear', direction="both")
             filtered_df["offset"] = filtered_df["offset"].ffill()
             filtered_df["offset"] = filtered_df["offset"].bfill()
-            print("offset fill")
-            print(filtered_df)
+
                 #if offset_value_a and offset_value_b:
                 #    filtered_df.loc[first_idx, "offset"] = df.loc[first_idx, "data"] - offset_value_a
                 #    print(filtered_df)
@@ -568,8 +567,33 @@ def update_grid_data(rows, graph_selection, find_peaks_btn, peak_distance, heigh
     
     desired_order = ["datetime", "data", "initial_data", "selection"]
     df = df[[col for col in desired_order if col in df.columns]].copy()
+    
+    try:
+        from sqlalchemy import text, create_engine
+        import urllib
+        host_name = "KCITSQLPRNRPX01"
+        db_name = "gData"
+        server = "KCITSQLPRNRPX01"
+        server = "10.82.12.39"
+        driver = "SQL Server"
         
-    return df.to_dict("records"), [{"field": col, "editable": True} for col in df.columns]
+        sql_alchemy_connection = urllib.parse.quote_plus('DRIVER={'+driver+'}; SERVER='+server+'; DATABASE='+db_name+'; Trusted_Connection=yes;')
+        sql_engine = create_engine("mssql+pyodbc:///?odbc_connect=%s" % sql_alchemy_connection)
+        conn = sql_engine.raw_connection()
+
+        sql = f"""
+        SELECT TOP 4 SITE_CODE as site
+        from tblGaugeLLID 
+        WHERE STATUS = 'Active'
+        """
+
+        site_list = pd.read_sql_query(sql, conn)
+        conn.close()
+        sql_output = site_list['site'].tolist()
+    except Exception as e:
+        sql_output = str(e)
+
+    return df.to_dict("records"), [{"field": col, "editable": True} for col in df.columns], sql_output
 
 
 @app.callback(
